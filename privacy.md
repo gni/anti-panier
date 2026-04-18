@@ -1,0 +1,1 @@
+anti-panier is deeply committed to user privacy. The extension operates 100% locally on your device. It only reads the current web page URL to detect checkout-related keywords. anti-panier does NOT collect, store, transmit, or share any personal data, browsing history, keystrokes, or financial information with any external servers.
