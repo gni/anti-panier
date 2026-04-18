@@ -323,13 +323,34 @@
 
   const checkUrl = () => {
     if (isUnlocked) return;
-    const url = window.location.href.toLowerCase();
-    const checkoutKeywords = ['cart', 'checkout', 'panier', 'basket', 'commande', 'buy', 'pay'];
-    const isCheckoutPage = checkoutKeywords.some(keyword => url.includes(keyword));
 
-    if (isCheckoutPage) {
-      showOverlay();
-    } else {
+    try {
+      // On utilise l'objet URL pour analyser proprement l'adresse (sans le nom de domaine)
+      const urlObj = new URL(window.location.href);
+      const pathAndQuery = (urlObj.pathname + urlObj.search).toLowerCase();
+
+      // REGEX STRICTE : 
+      // \/ ou [?&] -> Le mot DOIT être précédé par un slash (ex: /cart) ou un paramètre (?cart)
+      // (cart|checkout|panier|basket|bag|commande|paiement) -> Les mots cibles
+      // (\/|\?|&|#|$) -> Le mot DOIT être suivi d'une fin d'URL, d'un slash, ou d'un paramètre
+      const checkoutRegex = /(?:\/|[?&])(cart|checkout|panier|basket|bag|commande|paiement)(?:[\/?&#]|$)/i;
+
+      // Domaines développeurs à ignorer par sécurité
+      const isDeveloperSite = ['github.com', 'gitlab.com', 'stackoverflow.com', 'localhost'].includes(urlObj.hostname);
+
+      if (isDeveloperSite) {
+        hideOverlay();
+        return;
+      }
+
+      // Si le chemin correspond exactement à la structure d'un panier
+      if (checkoutRegex.test(pathAndQuery)) {
+        showOverlay();
+      } else {
+        hideOverlay();
+      }
+    } catch (e) {
+      // Sécurité si l'URL est mal formée
       hideOverlay();
     }
   };
